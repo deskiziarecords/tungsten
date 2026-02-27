@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tungsten-lattice"
+version = "1.0.0"
+description = "A Thermodynamic Operating System for High-Efficiency Logic."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Your Name", email = "forge@tungsten.io" }
+]
+keywords = ["AI", "Thermodynamics", "Blackwell", "Optimization", "High-Performance"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-repo/tungsten-lattice"
+Issues = "https://github.com/your-repo/tungsten-lattice/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tungsten"]
