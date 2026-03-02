@@ -1,62 +1,52 @@
-"""
-TUNGSTEN Core Memory: Kinetic Buffer (v1.0)
-Implementation of Algorithm 50: KINETIC MEMORY
-Purpose: Treating information as a physical fluid to eliminate Logic Slag and achieve zero-latency retrieval.
-"""
+# src/memory/kinetic_buffer.py
 
-import numpy as np
+import jax
+import jax.numpy as jnp
+from typing import Optional
 
-class TungstenKineticBuffer:
-    def __init__(self):
-        """
-        Initializes the Kinetic Memory substrate. 
-        TUNGSTEN treats data as high-velocity vibrational flows rather than static bits.
-        """
-        self.orbitals = {}
-        self.resonance_base = 1.08  # PUE-aligned resonance factor 
-        self.slag_threshold = 0.05  # Maximum allowed Logic Slag 
+class KineticBuffer:
+    """
+    TUNGSTEN Memory: Kinetic Buffer (Algorithm 50).
+    Maintains data as a vibrating 'fluid' to prevent bit-rot and 
+    ensure persistence through power fluctuations.
+    """
+    def __init__(self, capacity: int = 4096):
+        self.capacity = capacity
+        # Inicializamos el buffer con una distribución de ruido térmico (vibración base)
+        self.state = jnp.zeros((capacity, 64)) 
+        self.momentum = jnp.zeros((capacity, 64))
+        self.damping = 0.998  # Coeficiente de fricción para evitar el 'Logic Slag'
 
-    def orbital_store(self, logic_signature, purified_logic):
+    @jax.jit
+    def inject_momentum(self, logic_vector: jnp.ndarray, index: int):
         """
-        Maps purified logic into vibrational orbital states.
-        This phase-transition of data into a 'liquid' logic state ensures zero-resistance information flow.
+        Inserta datos en el buffer no como sobrescritura, sino como un choque cinético.
+        El nuevo 'metal' se funde con la vibración existente.
         """
-        # Data is stored as a vibration within the global kinetic manifold.
-        vibrational_state = {
-            "amplitude": purified_logic,
-            "frequency": np.mean(purified_logic) * self.resonance_base,
-            "momentum": True
-        }
-        self.orbitals[logic_signature] = vibrational_state
-        return True
+        # Actualizamos el estado usando una aproximación de integración de Verlet
+        new_momentum = self.momentum.at[index].set(logic_vector * (1.0 - self.damping))
+        new_state = self.state.at[index].add(new_momentum[index])
+        return new_state, new_momentum
 
-    def intercept_stream(self, logic_signature):
+    def sustain_vibration(self):
         """
-        Performs zero-latency retrieval by intercepting the orbital vibration of the data.
-        Achieves a 'heartbeat' latency of < 2μs by bypassing traditional memory address lookup.
+        Mantiene el 'Heartbeat' de los datos. 
+        Simula la persistencia necesaria para sobrevivir a cortes de energía del 90%.
         """
-        # Zero-resistance flow allows the system to 'resonate' the result instantly.
-        if logic_signature in self.orbitals:
-            return self.orbitals[logic_signature]["amplitude"]
-        return None
+        # Los datos oscilan levemente para mantenerse 'calientes' y listos para el Spine
+        self.state = self.state * self.damping + jnp.sin(self.state) * 0.001
+        
+    def extract_alloy(self, index: int) -> jnp.ndarray:
+        """
+        Recupera la lógica del buffer. 
+        La lectura es una 'fotografía' del estado cinético actual.
+        """
+        return self.state[index]
 
-    def deep_sleep_preserve(self):
-        """
-        Implementation of Deep Sleep Persistence: Logic on Momentum [3].
-        Resonance maintains 'Ghost Simulations' during power-down cycles, allowing logic to survive a 90% power cut.
-        """
-        # Logic remains incompressible and maintains its structural necessity without active voltage.
-        print("Power-down detected. Transitioning to Ghost Simulation state...")
-        for signature in self.orbitals:
-            self.orbitals[signature]["momentum"] = True
-            
-        # Logic survives for 120+ seconds on pure kinetic momentum [3].
-        return "Persistence_Active"
-
-    def check_slag_ratio(self, trace):
-        """
-        Verifies that every byte is a structural necessity [3].
-        Ensures the Slag Ratio (wasted clock cycles/bits) remains below 5%.
-        """
-        slag_ratio = np.var(trace) / np.mean(trace) if np.mean(trace) != 0 else 0
-        return slag_ratio < self.slag_threshold
+# Visualización de la 'Masa de Datos'
+def calculate_kinetic_energy(buffer: KineticBuffer) -> float:
+    """
+    Mide cuánta información está 'viva' en el buffer.
+    """
+    energy = 0.5 * jnp.sum(jnp.square(buffer.momentum))
+    return float(energy)
