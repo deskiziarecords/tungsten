@@ -1,65 +1,58 @@
-"""
-TUNGSTEN Core Bridge: Gallium Ingestor (v1.0)
-Implementation of Algorithm 58: GALLIUM MELT
-Purpose: Phase-transition ingestion and elimination of Logic Slag from external data streams.
-"""
+# src/bridge/gallium_melt.py
 
-import numpy as np
+import jax.numpy as jnp
+from typing import List, Any
+import re
 
 class GalliumMelt:
-    def __init__(self, slag_threshold=0.05):
-        """
-        Initializes the Gallium Ingestor.
-        Data is treated as a liquid state ("Gallium") to be purified before crystallization into the Spine.
-        """
-        self.slag_threshold = slag_threshold
-        self.purity_index = 0.0
+    """
+    TUNGSTEN Bridge: Gallium Melt (Algorithm 58).
+    Deconstructs external syntax into logical 'melts' for the Spine.
+    """
+    def __init__(self):
+        self.purity_threshold = 0.98
+        self.active_isomorphs = []
 
-    def melt(self, external_stream):
+    def melt(self, external_code: str) -> jnp.ndarray:
         """
-        Performs the phase-transition ingestion.
-        Converts rigid external syntax into a high-entropy "liquid" logic state for processing.
+        Phase-transition ingestion: Converts raw string/bytecode 
+        into a high-density intent vector.
         """
-        print("Initiating Gallium Melt: Transitioning external stream to liquid logic state...")
-        # Simulating the transition of raw bits into a differentiable manifold
-        liquid_logic = np.frombuffer(external_stream.encode(), dtype=np.uint8).astype(float)
-        return liquid_logic
-
-    def strip_syntax_slag(self, liquid_logic):
-        """
-        Implementation of Algorithm 58: Slag Removal.
-        Strips metadata, boilerplate, and redundant instructions to minimize entropy.
-        Ensures the 'Slag Ratio' remains below the 5% threshold for maximum thermal sharpness.
-        """
-        # Logic Slag is identified as high-variance, low-information-density noise.
-        mean_signal = np.mean(liquid_logic)
-        std_signal = np.std(liquid_logic)
+        # 1. Strip Syntax Slag (Boilerplate, comments, formatting)
+        clean_logic = self.strip_syntax_slag(external_code)
         
-        # Filtering process to extract the 'Logic Signature'
-        purified_logic = liquid_logic[np.abs(liquid_logic - mean_signal) < std_signal]
+        # 2. Token Resonance (Mapping to abstract semantic space)
+        # Convert text to a normalized numeric representation
+        intent_vector = jnp.array([ord(c) for c in clean_logic[:1024]])
         
-        self.purity_index = len(purified_logic) / len(liquid_logic)
-        print(f"Purification Complete. Purity Index: {self.purity_index:.4f}")
-        return purified_logic
+        # 3. Inject Orbital Flow
+        return self.inject_orbital_flow(intent_vector)
 
-    def inject_orbital_flow(self, purified_logic):
+    def strip_syntax_slag(self, code: str) -> str:
         """
-        Feeds the purified logic into the Kinetic Memory buffer (Algorithm 50).
-        The data is no longer static bits but 'vibrational' orbital flow.
+        Removes metadata and boilerplate that creates computational friction.
         """
-        if self.purity_index < (1.0 - self.slag_threshold):
-            print("Warning: High Logic Slag detected. Recalibrating melt temperature...")
-            # Self-correcting the ingestion parameters
-        
-        print("Injecting orbital flow into Kinetic Memory substrate...")
-        # Mapping to Kinetic Memory (Algorithm 50: Orbital Store)
-        # In a real TUNGSTEN deployment, this triggers zero-latency intercept streams.
-        return True
+        # Remove comments, extra whitespace, and non-functional symbols
+        no_comments = re.sub(r'#.*|\/\/.*', '', code)
+        compact = "".join(no_comments.split())
+        return compact
 
-    def get_residue_ratio(self):
+    def inject_orbital_flow(self, intent_vector: jnp.ndarray) -> jnp.ndarray:
         """
-        Calculates the information vs. syntax slag ratio.
-        A key metric for maintaining TUNGSTEN's 9.1x efficiency gain.
+        Prepares the vector for the Kinetic Memory (vibration state).
         """
-        return 1.0 - self.purity_index
+        # Normalization for the Bekenstein-Hawking Guardrail
+        norm = jnp.linalg.norm(intent_vector)
+        if norm > 0:
+            return intent_vector / norm
+        return intent_vector
 
+# Visualización del proceso de 'fundición'
+def get_melt_diagnostics(vector: jnp.ndarray):
+    """
+    Returns the 'Heat Profile' of the ingested logic.
+    """
+    return {
+        "logic_density": jnp.count_nonzero(vector),
+        "thermal_potential": jnp.var(vector)
+    }
