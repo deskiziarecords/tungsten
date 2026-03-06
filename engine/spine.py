@@ -17,3 +17,17 @@ def weierstrass_kernel(query_vec, letter_coords, sigma=1.0):
     resonance = normalization * jnp.exp(-dists / (4 * sigma))
     
     return resonance # Returns a probability 'blur' over the lattice
+
+
+def observe_lattice(state, impulse):
+    """
+    Rastrea la 'vibración' de la Lattice Alpha-647.
+    """
+    # 1. Captura la energía del impulso
+    energy_signature = jnp.linalg.norm(impulse)
+    
+    # 2. Registra el desplazamiento en el manifold W-Orion
+    trajectory_point = get_manifold_coords(state)
+    
+    # 3. Almacena en el Kinetic Buffer (Letter #79 style)
+    return store_essence(energy_signature, trajectory_point)
