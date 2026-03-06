@@ -62,7 +62,7 @@ class TungstenOrchestrator:
         Scans logs for 'stress fractures' (inefficiencies) and mutates logic to update the Spine [5].
         """
         # Logic mutation ensures the system evolves its own shape based on the problems it solves [5, 6].
-        if self.harmony_index < 0.90:
+        if self.harmony_index < 0.90 or any("SLAG" in log for log in system_logs):
             print("Stress fracture detected. Initiating Log-to-Alloy Pipeline...")
             return "New_Logic_Alloy_Generated"
         return "System_Optimal"

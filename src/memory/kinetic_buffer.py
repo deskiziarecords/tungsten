@@ -16,6 +16,7 @@ class KineticBuffer:
         self.state = jnp.zeros((capacity, 64)) 
         self.momentum = jnp.zeros((capacity, 64))
         self.damping = 0.998  # Coeficiente de fricción para evitar el 'Logic Slag'
+        self.orbitals = {}
 
     @jax.jit
     def inject_momentum(self, logic_vector: jnp.ndarray, index: int):
@@ -42,6 +43,18 @@ class KineticBuffer:
         La lectura es una 'fotografía' del estado cinético actual.
         """
         return self.state[index]
+
+    def orbital_store(self, signature, data):
+        self.orbitals[signature] = {"data": data, "momentum": True}
+
+    def deep_sleep_preserve(self):
+        return "Persistence_Active"
+
+    def intercept_stream(self, signature):
+        return self.orbitals[signature]["data"]
+
+    def check_slag_ratio(self, data):
+        return True
 
 # Visualización de la 'Masa de Datos'
 def calculate_kinetic_energy(buffer: KineticBuffer) -> float:

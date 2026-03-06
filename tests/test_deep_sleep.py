@@ -9,12 +9,12 @@ import numpy as np
 import argparse
 import sys
 # Mapping to internal TUNGSTEN memory hierarchy 
-from src.memory.kinetic_buffer import TungstenKineticBuffer
+from src.memory.kinetic_buffer import KineticBuffer
 
 class TestDeepSleep(unittest.TestCase):
     def setUp(self):
         """Initializes the Kinetic Buffer with high-heat logic signatures."""
-        self.buffer = TungstenKineticBuffer()
+        self.buffer = KineticBuffer()
         self.logic_signature = "Lattice_Resonance_Alpha"
         # Pure logic ore with zero syntax slag to ensure structural necessity.
         self.data_ore = np.array([0.92, 0.08, 0.95, 0.03]) 
